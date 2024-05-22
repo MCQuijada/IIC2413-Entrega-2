@@ -76,9 +76,9 @@ WSGI_APPLICATION = 'entrega_2.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "mydatabase",
-        "USER": "mydatabaseuser",
-        "PASSWORD": "mypassword",
+        "NAME": "entrega_2",
+        "USER": "manuel",
+        "PASSWORD": "worm33",
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
