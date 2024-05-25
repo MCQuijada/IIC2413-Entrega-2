@@ -166,33 +166,16 @@ SQL_14_sucursales_comunas = '''
     );
 '''
 
-SQL_15_ingredientes = '''
-    CREATE TABLE IF NOT EXISTS ingredientes(
-        id INT PRIMARY KEY,
-        ingrediente VARCHAR(30) NOT NULL
-    );
-'''
-
-SQL_16_plato_ingredientes = '''
-    CREATE TABLE IF NOT EXISTS plato_ingredientes(
-        id_plato INT,
-        id_ingrediente INT,
-        FOREIGN KEY (id_plato) REFERENCES platos(id),
-        FOREIGN KEY (id_ingrediente) REFERENCES ingredientes(id)       
-    );
-'''
-
 instrucciones_de_tablas = [
     SQL_1_clientes, SQL_2_comunas, SQL_3_direcciones, SQL_4_restaurantes, SQL_5_platos, SQL_6_platos_restaurantes,
     SQL_7_sucursales, SQL_8_deliverys, SQL_9_suscripciones, SQL_10_despachadores, SQL_11_pedidos,
-    SQL_12_calificaciones, SQL_13_pedidos_platos, SQL_14_sucursales_comunas, SQL_15_ingredientes, SQL_16_plato_ingredientes
+    SQL_12_calificaciones, SQL_13_pedidos_platos, SQL_14_sucursales_comunas
 ]
 nombres_de_tablas = ['clientes', 'comunas', 'direcciones', 
                      'restaurantes', 'platos', 'platos_restaurantes', 
                      'sucursales', 'deliverys', 'suscripciones', 
                      'despachadores', 'pedidos', 'calificaciones',
-                     'pedidos_platos', 'sucursales_comunas', 'ingredientes', 
-                     'plato_ingredientes']
+                     'pedidos_platos', 'sucursales_comunas']
 
 tablas_nombre_instruccion = list(zip(nombres_de_tablas, instrucciones_de_tablas))
 
