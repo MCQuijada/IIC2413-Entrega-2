@@ -10,13 +10,6 @@ DATABASE_USER_PASSWORD = os.getenv('DATABASE_USER_PASSWORD')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_PORT = os.getenv('DATABASE_PORT')
 
-def creador_de_tablas(SQL, cursor, tabla):
-    try:
-        cursor.execute(SQL)
-    except Exception as Error:
-        print(f"Error al crear la tabla {tabla}: {Error} ")
-
-
 SQL_1_clientes = '''
     CREATE TABLE IF NOT EXISTS clientes(
         id INT PRIMARY KEY,
@@ -202,6 +195,12 @@ nombres_de_tablas = ['clientes', 'comunas', 'direcciones',
                      'plato_ingredientes']
 
 tablas_nombre_instruccion = list(zip(nombres_de_tablas, instrucciones_de_tablas))
+
+def creador_de_tablas(SQL, cursor, tabla):
+    try:
+        cursor.execute(SQL)
+    except Exception as Error:
+        print(f"Error al crear la tabla {tabla}: {Error} ")
 
 try:
     with psycopg2.connect(
