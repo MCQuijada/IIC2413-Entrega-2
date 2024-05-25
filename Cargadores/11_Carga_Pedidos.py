@@ -2,7 +2,7 @@ import csv
 import psycopg2
 import datetime
 
-def carga_tabla(archivo_csv, nombre_tabla, cursor):
+def carga_pedido(archivo_csv, nombre_tabla, cursor):
     with open(archivo_csv, 'r') as f:
         datos = csv.reader(f)
         next(datos)  # me salto la primera fila (cabecera)
@@ -19,10 +19,9 @@ def carga_tabla(archivo_csv, nombre_tabla, cursor):
                 fecha = datetime.datetime.strptime(dato[5], "%d-%m-%y").date()
                 hora = datetime.datetime.strptime(dato[6], "%H:%M:%S").time()
                 try:
-                    cursor.execute(
-                        f"INSERT INTO {nombre_tabla} VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                        (dato[0], id_cliente, 1, id_delivery, id_despachador, fecha, hora, dato[7])
-                    )
+                    SQL = f"INSERT INTO {nombre_tabla} (id, id_cliente, id_sucursal, id_delivery, id_despachador, fecha, hora, estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                    data = (dato[0], id_cliente, 1, id_delivery, id_despachador, fecha, hora, dato[7],)
+                    cursor.execute(SQL, data)
                 except psycopg2.IntegrityError as error:
                     print(f"Error de integridad: {error}")
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
@@ -30,18 +29,18 @@ def carga_tabla(archivo_csv, nombre_tabla, cursor):
                     conn.commit()  # Commit para guardar los cambios
 
 # Conexión a la base de datos
-conn = psycopg2.connect(
-    user="nose",
-    password="no se",
-    host="nose",
-    port="nose",
-    database="xd"
-)
-
-cur = conn.cursor()
-archivo_csv = '/ruta/al/archivo.csv'
-nombre_tabla = 'nombre_de_tu_tabla'
-carga_tabla(archivo_csv, nombre_tabla, cur)
-
-cur.close()
-conn.close()
+try:
+    with psycopg2.connect(
+        host="pavlov.ing.puc.cl",
+        user="grupo121",
+        password="bases202401",
+        port="5432",
+        database="Proyecto_Base_Datos"
+    ) as conn:
+        with conn.cursor() as cur:
+            archivo_csv = 'pedidos2.csv'
+            nombre_tabla = 'Pedidos'
+            carga_pedido(archivo_csv, nombre_tabla, cur)
+            print("Carga Finalizada")
+except Exception as Error:
+    print(f"No se pudo conectar: {Error}")

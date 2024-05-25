@@ -13,10 +13,9 @@ def carga_comuna(archivo_csv, tabla, cursor):
             cuenta = cursor.fetchone()[0]
             if cuenta == 0:
                 try:
-                    cursor.execute(
-                        f"INSERT INTO {tabla} (id, nombre, provincia, region) VALUES (%s, %s, %s, %s)",
-                        (comuna[0], comuna[1], comuna[2], comuna[3])
-                    )
+                    SQL = f"INSERT INTO {tabla} (id, nombre, provincia, region) VALUES (%s, %s, %s, %s)"
+                    data = (comuna[0], comuna[1], comuna[2], comuna[3])
+                    cursor.execute(SQL, data)
                 except psycopg2.IntegrityError as error:
                     print(f"Error de integridad: {error}")
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
@@ -26,18 +25,18 @@ def carga_comuna(archivo_csv, tabla, cursor):
                 print(f"Comuna {comuna[0]}, {comuna[1]} ya existe")
 
 # Conexión a la base de datos
-conn = psycopg2.connect(
-    user="tu_usuario",
-    password="tu_contraseña",
-    host="localhost",
-    port="5432",
-    database="Proyecto_Base_Datos"
-)
-
-cur = conn.cursor()
-archivo_csv = 'datos.csv'
-nombre_tabla = 'nombre_tabla'
-carga_comuna(archivo_csv, nombre_tabla, cur)
-
-cur.close()
-conn.close()
+try:
+    with psycopg2.connect(
+        host="pavlov.ing.puc.cl",
+        user="grupo121",
+        password="bases202401",
+        port="5432",
+        database="Proyecto_Base_Datos"
+    ) as conn:
+        with conn.cursor() as cur:
+            archivo_csv = 'comuna.csv'
+            nombre_tabla = 'Comunas'
+            carga_comuna(archivo_csv, nombre_tabla, cur)
+            print("Carga Finalizada")
+except Exception as Error:
+    print(f"No se pudo conectar: {Error}")

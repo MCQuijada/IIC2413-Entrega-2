@@ -14,10 +14,9 @@ def carga_plato_restaurante(archivo_csv, tabla, cursor):
 
             if resultado:
                 try:
-                    cursor.execute(
-                        f"INSERT INTO {tabla} (id_plato, id_restaurante) VALUES (%s, %s)",
-                        (resultado[0], resultado[1])
-                    )
+                    SQL = f"INSERT INTO {tabla} (id_plato, id_restaurante) VALUES (%s, %s)"
+                    data = (resultado[0], resultado[1],)
+                    cursor.execute(SQL, data)
                 except psycopg2.IntegrityError as error:
                     print(f"Error de integridad: {error}")
                     conn.rollback()  # Rollback en caso de error
@@ -25,17 +24,18 @@ def carga_plato_restaurante(archivo_csv, tabla, cursor):
                     conn.commit()  # Commit para guardar los cambios
 
 # Conexión a la base de datos
-conn = psycopg2.connect(
-    user="tu_usuario",
-    password="tu_contraseña",
-    host="localhost",
-    port="5432",
-    database="Proyecto_Base_Datos"
-)
-
-cur = conn.cursor()
-archivo_csv = 'platos.csv'
-nombre_tabla = 'PlatosRestaurantes'  # Asumí que esta es la tabla destino correcta
-carga_plato_restaurante(archivo_csv, nombre_tabla, cur)
-cur.close()
-conn.close()
+try:
+    with psycopg2.connect(
+        host="pavlov.ing.puc.cl",
+        user="grupo121",
+        password="bases202401",
+        port="5432",
+        database="Proyecto_Base_Datos"
+    ) as conn:
+        with conn.cursor() as cur:
+            archivo_csv = 'platos.csv'
+            nombre_tabla = 'Platos_Restaurantes'
+            carga_plato_restaurante(archivo_csv, nombre_tabla, cur)
+            print("Carga Finalizada")
+except Exception as Error:
+    print(f"No se pudo conectar: {Error}")
