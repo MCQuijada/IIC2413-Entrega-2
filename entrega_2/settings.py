@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_USER_PASSWORD = os.getenv('DATABASE_USER_PASSWORD')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
+DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,11 +86,11 @@ WSGI_APPLICATION = 'entrega_2.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "entrega_2",
-        "USER": "manuel",
-        "PASSWORD": "worm33",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "NAME": DATABASE_NAME,
+        "USER": DATABASE_USER,
+        "PASSWORD": DATABASE_USER_PASSWORD,
+        "HOST": DATABASE_HOST,
+        "PORT": DATABASE_PORT,
     }
 }
 
