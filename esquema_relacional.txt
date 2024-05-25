@@ -147,21 +147,28 @@ A. Crear todas las tablas de datos con los datos respectivos
         id_restaurante FOREIGN KEY
     )
 
-    13. Platos-Ingredientes
+    13. Ingredientes
+
+    CREATE TABLE ingredientes(
+        id_ingrediente INT PRIMARY KEY,
+        ingrediente VARCHAR(30) NOT NULL
+    )
+
+    14. Platos-Ingredientes
 
     CREATE TABLE platos_ingredientes(
         id_plato FOREIGN KEY,
         id_ingrediente FOREIGN KEY
     )
 
-    14. Pedidos-Platos
+    15. Pedidos-Platos
 
     CREATE TABLE pedidos_platos(
         id_pedido FOREIGN KEY,
         id_plato FOREIGN KEY
     )
 
-    15. Sucursales-Comunas
+    16. Sucursales-Comunas X
 
     CREATE TABLE sucursales_comunas(
         id_sucursal FOREIGN KEY,
