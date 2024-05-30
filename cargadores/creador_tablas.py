@@ -1,6 +1,7 @@
 #Cambios
 #Email 45
 #Direccion text
+#Comuna 50
 
 import psycopg2
 import os
@@ -23,7 +24,7 @@ def creador_de_tablas(SQL, cursor, tabla):
 
 SQL_1_clientes = '''
     CREATE TABLE IF NOT EXISTS clientes(
-        id INT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         nombre VARCHAR(30) NOT NULL,
         email VARCHAR(45) NOT NULL UNIQUE,
         clave VARCHAR(100) NOT NULL,
@@ -35,24 +36,32 @@ SQL_2_comunas = '''
         id INT PRIMARY KEY,
         nombre VARCHAR(30),
         provincia VARCHAR(30),
-        region VARCHAR(30)
+        region VARCHAR(50)
     );
 '''
 
 SQL_3_direcciones = '''
     CREATE TABLE IF NOT EXISTS direcciones(
-        id INT PRIMARY KEY,
-        id_cliente INT,
-        direccion VARCHAR(60) NOT NULL,
+        id SERIAL PRIMARY KEY,
+        direccion TEXT NOT NULL UNIQUE,
         cut_comuna INT,
-        FOREIGN KEY (id_cliente) REFERENCES clientes(id),
         FOREIGN KEY (cut_comuna) REFERENCES comunas(id)
     );
 '''
 
+SQL_3_5_direccion_cleinte = '''
+    CREATE TABLE IF NOT EXISTS direcciones_clientes(
+    id_direccion INT,
+    id_cliente INT,
+    PRIMARY KEY(id_direccion, id_cliente),
+    FOREIGN KEY (id_direccion) REFERENCES direcciones(id),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id)
+    )
+'''
+
 SQL_4_restaurantes = '''
     CREATE TABLE IF NOT EXISTS restaurantes(
-        id INT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         nombre VARCHAR(30) NOT NULL UNIQUE,
         vigencia BOOLEAN NOT NULL,
         estilo VARCHAR(30) NOT NULL,
@@ -99,8 +108,8 @@ SQL_7_sucursales = '''
 
 SQL_8_deliverys = '''
     CREATE TABLE IF NOT EXISTS deliverys(
-        id INT PRIMARY KEY,
-        nombre VARCHAR(30) NOT NULL,
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(30) NOT NULL UNIQUE,
         vigencia BOOLEAN NOT NULL,
         fono VARCHAR(12) NOT NULL UNIQUE,
         tiempo_despacho INT NOT NULL,
@@ -112,13 +121,14 @@ SQL_8_deliverys = '''
 
 SQL_9_suscripciones = '''
     CREATE TABLE IF NOT EXISTS suscripciones(
-        id INT PRIMARY KEY,
+        id SERIAL,
         id_cliente INT,
         id_delivery INT,
         ultimo_pago INT,
         estado VARCHAR(30),
         fecha DATE,
         ciclo VARCHAR(30),
+        PRIMARY KEY (id_cliente, id_delivery),
         FOREIGN KEY (id_cliente) REFERENCES clientes(id),
         FOREIGN KEY (id_delivery) REFERENCES deliverys(id)
     );
@@ -194,11 +204,11 @@ SQL_16_plato_ingredientes = '''
 '''
 
 instrucciones_de_tablas = [
-    SQL_1_clientes, SQL_2_comunas, SQL_3_direcciones, SQL_4_restaurantes, SQL_5_platos, SQL_6_platos_restaurantes,
+    SQL_1_clientes, SQL_2_comunas, SQL_3_direcciones, SQL_3_5_direccion_cleinte, SQL_4_restaurantes, SQL_5_platos, SQL_6_platos_restaurantes,
     SQL_7_sucursales, SQL_8_deliverys, SQL_9_suscripciones, SQL_10_despachadores, SQL_11_pedidos,
     SQL_12_calificaciones, SQL_13_pedidos_platos, SQL_14_sucursales_comunas, SQL_15_ingredientes, SQL_16_plato_ingredientes
 ]
-nombres_de_tablas = ['clientes', 'comunas', 'direcciones', 
+nombres_de_tablas = ['clientes', 'comunas', 'direcciones', 'direccion_cliente', 
                      'restaurantes', 'platos', 'platos_restaurantes', 
                      'sucursales', 'deliverys', 'suscripciones', 
                      'despachadores', 'pedidos', 'calificaciones',

@@ -12,19 +12,11 @@ DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 
 def carga_direcciones(archivo_csv, tabla, cursor, conn):
-    id = 1  # para los id
-    tuplas_malas = []
-    i = 0
     with open(archivo_csv, 'r') as f:
         Direcciones = csv.reader(f, delimiter=';')
         next(Direcciones)  # me salto la primera fila (cabecera)
+        malas = []
         for direccion in Direcciones:
-            if len(direccion) < 6:
-                cliente = [elem1 + elem2 for elem1, elem2 in zip(direccion[i], direccion[i+1])]
-                print("Tupla Arreglada:", direccion)
-                if len(cliente) > 6:
-                    tuplas_malas += Clientes[i]
-                    continue
             cursor.execute(
                 '''SELECT id FROM Clientes
                 WHERE Clientes.email = %s''',
@@ -33,17 +25,18 @@ def carga_direcciones(archivo_csv, tabla, cursor, conn):
             cliente = cursor.fetchone()
             if cliente:            
                 try:
-                    SQL = f"INSERT INTO {tabla} (id, id_cliente, direccion, cut_comuna) VALUES (%s, %s, %s, %s)"
-                    data = (id, cliente[0] , direccion[4], direccion[5],)
+                    SQL = f"INSERT INTO {tabla} (direccion, cut_comuna) VALUES (%s, %s)"
+                    data = (direccion[4], direccion[5],)
                     cursor.execute(SQL, data)
-                    id += 1
                 except Exception as error:
-                    print(f"Error de integridad: {error}")
+                    if not isinstance(error, psycopg2.IntegrityError) and error.pgcode == '23505':
+                        print(f"Error de integridad: {error}")
+                        malas += direccion
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
-                    tuplas_malas += direccion
                 else:
                     conn.commit()  # Commit para guardar los cambios
-    print(tuplas_malas)
+                    print("Tupla Cargada:", data)
+    print("tuplas para arreglar:",malas)
 
 # Conexión a la base de datos
 with psycopg2.connect(
@@ -54,7 +47,8 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = ('data/clientes.csv')
+            archivo_csv = ('IIC2413-Entrega-2/data/clientes.csv')
             nombre_tabla = 'direcciones'
             carga_direcciones(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")
+

@@ -14,16 +14,8 @@ def carga_comuna(archivo_csv, tabla, cursor, conn):
     with open(archivo_csv, 'r') as f:
         comunas = csv.reader(f)
         next(comunas)  # me salto la primera fila (cabecera)
-        i=0
         tuplas_malas = []
         for comuna in comunas:
-            print(comuna)
-            if len(comuna) < 4:
-                
-                cliente = [elem1 + elem2 for elem1, elem2 in zip(comunas[i], comunas[i+1])]
-                if cliente > 6:
-                    tuplas_malas += Clientes[i]
-                    continue
             cursor.execute(
                 f"SELECT COUNT(*) FROM {tabla} WHERE id = %s",
                 (comuna[0],)
@@ -40,9 +32,9 @@ def carga_comuna(archivo_csv, tabla, cursor, conn):
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
                 else:
                     conn.commit()  # Commit para guardar los cambios
+                    print("Carga de Tupla:", comuna)
             else:
                 print(f"Comuna {comuna[0]}, {comuna[1]} ya existe")
-            i += 1
         print(tuplas_malas)
 
         
@@ -56,7 +48,7 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = ('data/comuna.csv')
+            archivo_csv = ('IIC2413-Entrega-2/data/comuna.csv')
             nombre_tabla = 'comunas'
             carga_comuna(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")
