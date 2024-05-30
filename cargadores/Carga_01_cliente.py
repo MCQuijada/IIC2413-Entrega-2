@@ -1,12 +1,28 @@
 import csv
 import psycopg2
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_USER_PASSWORD = os.getenv('DATABASE_USER_PASSWORD')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
+DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 def carga_cliente(archivo_csv, tabla, cursor):
     id = 1  # para los id
     with open(archivo_csv, 'r') as f:
-        Clientes = csv.reader(f)
+        Clientes = csv.reader(f, delimiter=';')
         next(Clientes)  # me salto la primera fila (cabecera)
+        tuplas_malas = []
+        i = 0
         for cliente in Clientes:
+            if len(cliente) < 6:
+                cliente = [elem1 + elem2 for elem1, elem2 in zip(clientes[i], clientes[i+1])]
+                if cliente > 6:
+                    tuplas_malas += Clientes[i]
+                    continue
             cursor.execute(
                 f"SELECT COUNT(*) FROM {tabla} WHERE email = %s",
                 (cliente[1],)
@@ -20,25 +36,27 @@ def carga_cliente(archivo_csv, tabla, cursor):
                     id += 1
                 except psycopg2.IntegrityError as error:
                     print(f"Error de integridad: {error}")
+                    tuplas_malas += cliente
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
                 else:
                     conn.commit()  # Commit para guardar los cambios
-                    print("Una carga lista")
-            else:
-                print(f"Cliente {cliente[1]} ya existe")
+                    print("Una carga lista", cliente[1])
+            i += 1
+    print(tuplas_malas)
 
 # Conexión a la base de datos
+
 try:
     with psycopg2.connect(
-        host="pavlov.ing.puc.cl",
-        user="grupo121",
-        password="bases202401",
-        port="5432",
-        database="Proyecto_Base_Datos"
+        host= DATABASE_HOST,
+        user=DATABASE_USER,
+        password=DATABASE_USER_PASSWORD,
+        port=DATABASE_PORT,
+        database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = 'clientes.csv'
-            nombre_tabla = 'Clientes'
+            archivo_csv = ('data/clientes.csv')
+            nombre_tabla = 'clientes'
             carga_cliente(archivo_csv, nombre_tabla, cur)
             print("Carga Finalizada")
 except Exception as Error:

@@ -1,3 +1,7 @@
+#Cambios
+#Email 45
+#Direccion text
+
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -21,7 +25,7 @@ SQL_1_clientes = '''
     CREATE TABLE IF NOT EXISTS clientes(
         id INT PRIMARY KEY,
         nombre VARCHAR(30) NOT NULL,
-        email VARCHAR(30) NOT NULL UNIQUE,
+        email VARCHAR(45) NOT NULL UNIQUE,
         clave VARCHAR(100) NOT NULL,
         fono VARCHAR(12) NOT NULL
     );
@@ -39,7 +43,7 @@ SQL_3_direcciones = '''
     CREATE TABLE IF NOT EXISTS direcciones(
         id INT PRIMARY KEY,
         id_cliente INT,
-        direccion VARCHAR(30) NOT NULL,
+        direccion VARCHAR(60) NOT NULL,
         cut_comuna INT,
         FOREIGN KEY (id_cliente) REFERENCES clientes(id),
         FOREIGN KEY (cut_comuna) REFERENCES comunas(id)
