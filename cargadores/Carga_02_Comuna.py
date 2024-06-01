@@ -11,11 +11,12 @@ DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 def carga_comuna(archivo_csv, tabla, cursor, conn):
-    with open(archivo_csv, 'r') as f:
-        comunas = csv.reader(f)
+    with open(archivo_csv, mode='r', encoding='mac_roman') as f:
+        comunas = csv.reader(f, delimiter=";")
         next(comunas)  # me salto la primera fila (cabecera)
         tuplas_malas = []
         for comuna in comunas:
+            comuna =  [parte.replace("'", "") for parte in comuna]
             cursor.execute(
                 f"SELECT COUNT(*) FROM {tabla} WHERE id = %s",
                 (comuna[0],)
@@ -48,7 +49,7 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = ('IIC2413-Entrega-2/data/comuna.csv')
+            archivo_csv = ('IIC2413-Entrega-2/data/comuna2.csv')
             nombre_tabla = 'comunas'
             carga_comuna(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")

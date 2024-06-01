@@ -229,3 +229,10 @@ B. Agregar los datos de los archivos
         - Agregar un id_calificacion a cada linea
         - Asignar el id_pedido como foreign key
         - Colocar el resto de variables
+
+
+
+Platos -> Cada id es unico. Aun que hay repetidos como es el caso de id 6 y 7, ambos son referenciados en los pedidos
+mas de dos veces, por lo que los dejaremos como si cada id fuera unico (pero solo el id)
+
+Comunas -> Leer con mac_roman

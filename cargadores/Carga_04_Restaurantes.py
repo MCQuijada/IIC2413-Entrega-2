@@ -11,7 +11,7 @@ DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 def carga_restaurantes(archivo_csv, tabla,cursor, conn):
-    with open(archivo_csv, 'r') as f:
+    with open(archivo_csv, mode='r', encoding='mac_roman') as f:
         Restaurantes = csv.reader(f, delimiter=';')
         next(Restaurantes)  # me salto la primera fila (cabecera)
         tuplas_malas = []
@@ -21,7 +21,7 @@ def carga_restaurantes(archivo_csv, tabla,cursor, conn):
                 data = (restaurant[0], restaurant[1], restaurant[2], restaurant[3],)
                 cursor.execute(SQL, data)
             except Exception as error:
-                if not isinstance(error, psycopg2.IntegrityError) and error.pgcode == '23505':
+                if not isinstance(error, psycopg2.IntegrityError):
                     print(f"Error de integridad: {error}")
                     tuplas_malas += restaurant
                 conn.rollback()  # Rollback para evitar transacciones inconsistentes
@@ -39,7 +39,7 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = ('IIC2413-Entrega-2/data/restaurantes.csv')
+            archivo_csv = ('IIC2413-Entrega-2/data/restaurantes2.csv')
             nombre_tabla = 'restaurantes'
             carga_restaurantes(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")

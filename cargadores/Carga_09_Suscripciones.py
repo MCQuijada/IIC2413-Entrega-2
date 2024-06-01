@@ -20,7 +20,7 @@ def carga_suscripciones(archivo_csv, tabla, cursor, conn):
         repetidas = []
         for dato in datos:
             cursor.execute(
-                "SELECT clientes.id, deliverys.id FROM Clientes, Deliverys WHERE Clientes.email = %s AND Deliverys.nombre = %s",
+                "SELECT clientes.id, deliverys.id FROM clientes, deliverys WHERE Clientes.email = %s AND Deliverys.nombre = %s",
                 (dato[0], dato[1])
             )
             row = cursor.fetchone()

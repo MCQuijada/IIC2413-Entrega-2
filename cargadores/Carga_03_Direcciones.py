@@ -16,6 +16,7 @@ def carga_direcciones(archivo_csv, tabla, cursor, conn):
         Direcciones = csv.reader(f, delimiter=';')
         next(Direcciones)  # me salto la primera fila (cabecera)
         malas = []
+        no_cliente = []
         for direccion in Direcciones:
             cursor.execute(
                 '''SELECT id FROM Clientes
@@ -23,6 +24,7 @@ def carga_direcciones(archivo_csv, tabla, cursor, conn):
                 (direccion[1],)
             )
             cliente = cursor.fetchone()
+            print(cliente, direccion[4])
             if cliente:            
                 try:
                     SQL = f"INSERT INTO {tabla} (direccion, cut_comuna) VALUES (%s, %s)"
@@ -36,7 +38,10 @@ def carga_direcciones(archivo_csv, tabla, cursor, conn):
                 else:
                     conn.commit()  # Commit para guardar los cambios
                     print("Tupla Cargada:", data)
+            else:
+                no_cliente.append((direccion[1], direccion[4]))
     print("tuplas para arreglar:",malas)
+    print("NO CLIENTE:",no_cliente)
 
 # Conexión a la base de datos
 with psycopg2.connect(
