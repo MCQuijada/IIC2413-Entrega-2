@@ -1,4 +1,5 @@
 import csv
+import os
 import psycopg2
 
 def carga_calificaciones(archivo_csv, tabla, cursor):
@@ -31,7 +32,7 @@ try:
         database="Proyecto_Base_Datos"
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = 'calificaciones.csv'
+            archivo_csv = os.path.join('..','data','calificaciones.csv')
             nombre_tabla = 'Calificaciones'
             carga_calificaciones(archivo_csv, nombre_tabla, cur)
             print("Carga Finalizada")

@@ -41,7 +41,7 @@ with psycopg2.connect(
         database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = ('IIC2413-Entrega-2/data/calificacion.csv')
+            archivo_csv = os.path.join('..','data','calificacion.csv')
             nombre_tabla = 'calificaciones'
             carga_calificaciones(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")
