@@ -1,0 +1,28 @@
+<!-- consulta_2.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta 2</title>
+</head>
+<body>
+    <h1>Consulta 2: Pedidos de un cliente específico</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="email">Ingresa el correo electrónico del cliente:</label>
+        <input type="text" name="email" id="email">
+        <button type="submit">Buscar</button>
+    </form>
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+    {% if pedidos %}
+        <h2>Pedidos del cliente {{ cliente.nombre }}</h2>
+        <ul>
+            {% for pedido in pedidos %}
+                <li>Pedido #{{ pedido.id }} - Fecha: {{ pedido.fecha }} - Estado: {{ pedido.estado }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

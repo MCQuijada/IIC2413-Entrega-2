@@ -145,10 +145,10 @@ class Restaurantes(models.Model):
 
 
 class Sucursales(models.Model):
-    id = models.AutoField(unique=True)
+    id = models.AutoField(unique=True, primary_key=True)
     id_restaurante = models.ForeignKey(Restaurantes, models.DO_NOTHING, db_column='id_restaurante')
     sucursal = models.CharField(max_length=30)
-    direccion = models.TextField(primary_key=True)  # The composite primary key (direccion, id_restaurante) found, that is not supported. The first column is selected.
+    direccion = models.TextField()  # The composite primary key (direccion, id_restaurante) found, that is not supported. The first column is selected.
     fono = models.CharField(max_length=12)
     id_comuna = models.ForeignKey(Comunas, models.DO_NOTHING, db_column='id_comuna', blank=True, null=True)
 
@@ -169,8 +169,8 @@ class SucursalesComunas(models.Model):
 
 
 class Suscripciones(models.Model):
-    id = models.AutoField()
-    id_cliente = models.OneToOneField(Clientes, models.DO_NOTHING, db_column='id_cliente', primary_key=True)  # The composite primary key (id_cliente, id_delivery) found, that is not supported. The first column is selected.
+    id = models.AutoField(primary_key=True)
+    id_cliente = models.OneToOneField(Clientes, models.DO_NOTHING, db_column='id_cliente')  # The composite primary key (id_cliente, id_delivery) found, that is not supported. The first column is selected.
     id_delivery = models.ForeignKey(Deliverys, models.DO_NOTHING, db_column='id_delivery')
     ultimo_pago = models.IntegerField(blank=True, null=True)
     estado = models.CharField(max_length=30, blank=True, null=True)

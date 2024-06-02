@@ -1,0 +1,25 @@
+<!-- consulta_1.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta 1</title>
+</head>
+<body>
+    <h1>Consulta 1: Restaurantes que ofrecen un plato específico</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="query">Ingresa el nombre del plato:</label>
+        <input type="text" name="consulta" id="consulta">
+        <button type="submit">Buscar</button>
+    </form>
+    {% if restaurantes %}
+        <h2>Restaurantes que ofrecen "{{ consulta }}"</h2>
+        <ul>
+            {% for restaurante in restaurantes %}
+                <li>{{ restaurante.nombre }} - {% if restaurante.vigencia %}Disponible{% else %}No disponible{% endif %}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
