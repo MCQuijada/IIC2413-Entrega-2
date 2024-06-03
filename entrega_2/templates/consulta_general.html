@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta General</title>
+</head>
+<body>
+    <h1>Consulta General</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="atributos">Atributos:</label><br>
+        <input type="text" id="atributos" name="atributos"><br>
+        <label for="tablas">Tablas:</label><br>
+        <input type="text" id="tablas" name="tablas"><br>
+        <label for="condiciones">Condiciones:</label><br>
+        <input type="text" id="condiciones" name="condiciones"><br><br>
+        <input type="submit" value="Consultar">
+    </form>
+    <br>
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+    {% if results %}
+        <h2>Resultados:</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    {% for column_name in column_names %}
+                        <th>{{ column_name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>

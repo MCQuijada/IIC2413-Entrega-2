@@ -1,6 +1,15 @@
 from django.shortcuts import render
 from django.db.models import Q, Sum
+import psycopg2
 from .models import Clientes, Platos, Restaurantes, Pedidos, PedidosPlatos, Deliverys, PlatosRestaurantes, Calificaciones, Suscripciones
+from dotenv import load_dotenv
+import os
+load_dotenv()
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_USER_PASSWORD = os.getenv('DATABASE_USER_PASSWORD')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
+DATABASE_PORT = os.getenv('DATABASE_PORT')
 
 
 def index(request):
@@ -140,4 +149,39 @@ def consulta_10(request):
         return render(request, 'consulta_10.html')
     
 def consulta_general(request):
-    pass
+    if request.method == 'POST':
+        atributos = request.POST.get('atributos')
+        tablas = request.POST.get('tablas')
+        condiciones = request.POST.get('condiciones')
+
+        if atributos and tablas:
+            if isinstance(atributos, str) and isinstance(tablas, str):
+                conn = psycopg2.connect(
+                    host= DATABASE_HOST,
+                    user=DATABASE_USER,
+                    password=DATABASE_USER_PASSWORD,
+                    port=DATABASE_PORT,
+                    database=DATABASE_NAME
+                )
+
+                cursor = conn.cursor()
+                if condiciones:
+                    cursor.execute("SELECT {} FROM {} WHERE {}".format(atributos, tablas, condiciones))
+                else:
+                    cursor.execute("SELECT {} FROM {}".format(atributos, tablas))
+                    
+                results = cursor.fetchall()
+                column_names = [desc[0] for desc in cursor.description]
+
+                cursor.close()
+                conn.close()
+
+                return render(request, 'consulta_general.html', {'results': results, 'column_names': column_names})
+            else:
+                error_message = "Los atributos y las tablas deben ser strings válidos."
+                return render(request, 'consulta_general.html', {'error_message': error_message})
+        else:
+            error_message = "Atributos y tablas son campos obligatorios."
+            return render(request, 'consulta_general.html', {'error_message': error_message})
+    else:
+        return render(request, 'consulta_general.html')
