@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 7</title>
+</head>
+<body>
+    <h1>Consulta 7: Total Gastado por Cliente en Pedidos no Incluidos en Suscripciones</h1>
+    <table>
+        <tr>
+            <th>Cliente</th>
+            <th>Total Gastado</th>
+        </tr>
+        {% for cliente, total_gastado in total_gastado_por_cliente.items %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ total_gastado }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

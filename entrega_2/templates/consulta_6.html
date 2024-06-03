@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 6</title>
+</head>
+<body>
+    <h1>Consulta 6: Restaurantes por Cliente</h1>
+    <form method="GET">
+        <label for="cliente_email">Email del Cliente:</label>
+        <input type="text" id="cliente_email" name="cliente_email">
+        <button type="submit">Buscar</button>
+    </form>
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+    {% if restaurantes %}
+        <h2>Restaurantes a los que tiene acceso el cliente con email "{{ cliente_email }}":</h2>
+        <ul>
+            {% for restaurante in restaurantes %}
+                <li>{{ restaurante }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

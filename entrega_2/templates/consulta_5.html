@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 5</title>
+</head>
+<body>
+    <h1>Consulta 5: Platos por Estilo y Restricciones</h1>
+    <form method="GET">
+        <label for="estilo_plato">Estilo del Plato:</label>
+        <input type="text" id="estilo_plato" name="estilo_plato">
+        <button type="submit">Buscar</button>
+    </form>
+    {% if platos %}
+        <h2>Platos encontrados para el estilo "{{ estilo_plato }}":</h2>
+        <ul>
+            {% for plato in platos %}
+                <li>{{ plato.nombre }} - Restricción: {{ plato.restriccion }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

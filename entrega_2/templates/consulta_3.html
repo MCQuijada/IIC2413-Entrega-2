@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta 3: Pedidos Concretados y Cancelados</title>
+</head>
+<body>
+    <h1>Consulta 3: Pedidos Concretados y Cancelados</h1>
+
+    <h2>Pedidos Concretados</h2>
+    <ul>
+        {% for pedido in pedidos_concretados %}
+            <li>{{ pedido.id }} - {{ pedido.fecha }} - Precio Total: {{ pedido.precio_total }}</li>
+        {% endfor %}
+    </ul>
+    <p>Total de Pedidos Concretados: {{ total_concretados }}</p>
+
+    <h2>Pedidos Cancelados</h2>
+    <ul>
+        {% for pedido in pedidos_cancelados %}
+            <li>{{ pedido.id }} - {{ pedido.fecha }} - Precio Total: {{ pedido.precio_total }}</li>
+        {% endfor %}
+    </ul>
+    <p>Total de Pedidos Cancelados: {{ total_cancelados }}</p>
+</body>
+</html>

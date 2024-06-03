@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 10</title>
+</head>
+<body>
+    <h1>Consulta 10: Platos con Alergeno "{{ alergeno }}"</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="alergeno">Alergeno: </label>
+        <input type="text" id="alergeno" name="alergeno">
+        <button type="submit">Consultar</button>
+    </form>
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+    {% if platos_con_alergeno %}
+        <ul>
+            {% for plato in platos_con_alergeno %}
+                <li>{{ plato.nombre }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 8</title>
+</head>
+<body>
+    <h1>Consulta 8: Todos los Platos y los Restaurantes que los Ofrecen</h1>
+    <ul>
+        {% for plato_con_restaurantes in platos_con_restaurantes %}
+            <li>{{ plato_con_restaurantes.plato.nombre }}</li>
+            <ul>
+                {% for restaurante in plato_con_restaurantes.restaurantes %}
+                    <li>{{ restaurante.id_restaurante.nombre }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+</body>
+</html

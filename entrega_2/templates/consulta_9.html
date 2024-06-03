@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta 9</title>
+</head>
+<body>
+    <h1>Consulta 9: Evaluaciones Superiores o Iguales a {{ numero }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="numero">Número (1-5): </label>
+        <input type="number" id="numero" name="numero" min="1" max="5">
+        <button type="submit">Consultar</button>
+    </form>
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+    {% if evaluaciones %}
+        <ul>
+            {% for evaluacion in evaluaciones %}
+                <li>{{ evaluacion.id_pedido.id }} - Calificación Cliente: {{ evaluacion.cal_cliente }} - Calificación Despachador: {{ evaluacion.cal_despachador }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

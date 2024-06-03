@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta 4: Platos por Estilo</title>
+</head>
+<body>
+    <h1>Consulta 4: Platos por Estilo</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="estilo_plato">Ingrese el estilo del plato:</label>
+        <input type="text" name="estilo_plato" id="estilo_plato">
+        <button type="submit">Consultar</button>
+    </form>
+
+    {% if estilo_plato %}
+        <h2>Platos del estilo "{{ estilo_plato }}"</h2>
+        <ul>
+            {% for plato in platos %}
+                <li>{{ plato.nombre }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Restaurantes que ofrecen platos del estilo "{{ estilo_plato }}"</h2>
+        <ul>
+            {% for restaurante in restaurantes %}
+                <li>{{ restaurante.nombre }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Opciones de delivery disponibles para los restaurantes que ofrecen platos del estilo "{{ estilo_plato }}"</h2>
+        <ul>
+            {% for delivery in deliverys %}
+                <li>{{ delivery.nombre }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
