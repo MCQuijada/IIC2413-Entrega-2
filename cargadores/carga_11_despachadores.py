@@ -41,7 +41,8 @@ with psycopg2.connect(
         database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = os.path.join('..','data','cldeldes.csv')
+            dir_actual = os.getcwd()
+            archivo_csv = os.path.join(dir_actual,'data','cldeldes.csv')
             nombre_tabla = 'despachadores'
             carga_despachador(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")

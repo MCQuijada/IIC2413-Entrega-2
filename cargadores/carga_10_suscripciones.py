@@ -59,7 +59,8 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = os.path.join('..','data','suscripciones.csv')
+            dir_actual = os.getcwd()
+            archivo_csv = os.path.join(dir_actual,'data','suscripciones.csv')
             nombre_tabla = 'suscripciones'
             carga_suscripciones(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")

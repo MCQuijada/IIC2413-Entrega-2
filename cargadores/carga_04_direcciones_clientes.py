@@ -58,7 +58,8 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = os.path.join('..','data','clientes.csv')
+            dir_actual = os.getcwd()
+            archivo_csv = os.path.join(dir_actual,'data','clientes.csv')
             nombre_tabla = 'direcciones_clientes'
             carga_direccion_cliente(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")

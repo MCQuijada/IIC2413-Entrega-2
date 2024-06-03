@@ -31,9 +31,8 @@ def carga_direcciones(archivo_csv, tabla, cursor, conn):
                     data = (direccion[4], direccion[5],)
                     cursor.execute(SQL, data)
                 except Exception as error:
-                    if not isinstance(error, psycopg2.IntegrityError) and error.pgcode == '23505':
-                        print(f"Error de integridad: {error}")
-                        malas += direccion
+                    print(f"Error de integridad: {error}")
+                    malas += direccion
                     conn.rollback()  # Rollback para evitar transacciones inconsistentes
                 else:
                     conn.commit()  # Commit para guardar los cambios
@@ -52,7 +51,8 @@ with psycopg2.connect(
     database=DATABASE_NAME
     ) as conn:
         with conn.cursor() as cur:
-            archivo_csv = os.path.join('..','data','clientes.csv')
+            dir_actual = os.getcwd()
+            archivo_csv = os.path.join(dir_actual,'data','clientes.csv')
             nombre_tabla = 'direcciones'
             carga_direcciones(archivo_csv, nombre_tabla, cur, conn)
             print("Carga Finalizada")
