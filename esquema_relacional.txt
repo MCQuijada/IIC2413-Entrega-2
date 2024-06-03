@@ -23,87 +23,97 @@ RELACIONES Y CARDINALIDAD ------------------------------------------------------
 ORDEN DE AGREGACION Y MODIFICACIONES CON PYTHON Y POSTGRES -----------------------------------------------------------------------
 
 A. Crear todas las tablas de datos con los datos respectivos
-    1. Clientes:
-
-    CREATE TABLE clientes(
-        id INT PRIMARY KEY,
+SQL_1_clientes = '''
+    CREATE TABLE IF NOT EXISTS clientes(
+        id SERIAL PRIMARY KEY,
         nombre VARCHAR(30) NOT NULL,
-        email VARCHAR(30) NOT NULL UNIQUE,
+        email VARCHAR(45) NOT NULL UNIQUE,
         clave VARCHAR(100) NOT NULL,
         fono VARCHAR(12) NOT NULL
     );
-
-    2. Direcciones
-
-    CREATE TABLE direcciones(
-        id INT PRIMARY KEY,
-        id_cliente INT FOREIGN KEY,
-        direccion VARCHAR(30) NOT NULL,
-        cut_comuna INT FOREIGN KEY
-    );
-
-    3. Platos
-
-    CREATE TABLE platos(
-        id INT PRIMARY KEY,
-        nombre VARCHAR(30) NOT NULL,
-        descripcion TEXT,
-        disponibilidad BOOLEAN NOT NULL,
-        estilo VARCHAR(30) NOT NULL,
-        restriccion INT,
-        porciones INT DEFAULT 1 CHECK (id >= 1),
-        precio INT NOT NULL,
-        tiempo_prep INT DEFAULT 5 CHECK (tiempo_prep >= 1 AND tiempo_prep <= 60),
-    );
-
-    4. Comunas
-
-    CREATE TABLE comunas(
+'''
+SQL_2_comunas = '''
+    CREATE TABLE IF NOT EXISTS comunas(
         id INT PRIMARY KEY,
         nombre VARCHAR(30),
         provincia VARCHAR(30),
-        region VARCHAR(30)
+        region VARCHAR(50)
+    );
+'''
+
+SQL_3_direcciones = '''
+    CREATE TABLE IF NOT EXISTS direcciones(
+        id SERIAL PRIMARY KEY,
+        direccion TEXT NOT NULL UNIQUE,
+        cut_comuna INT,
+        FOREIGN KEY (cut_comuna) REFERENCES comunas(id)
+    );
+'''
+
+SQL_3_5_direccion_cleinte = '''
+    CREATE TABLE IF NOT EXISTS direcciones_clientes(
+    id_direccion INT,
+    id_cliente INT,
+    PRIMARY KEY(id_direccion, id_cliente),
+    FOREIGN KEY (id_direccion) REFERENCES direcciones(id),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id)
     )
+'''
 
-    5. Pedidos
-
-    CREATE TABLE pedidos(
-        id INT PRIMARY KEY,
-        id_cliente INT FOREIGN KEY,
-        id_sucursal INT FOREIGN KEY,
-        id_delivery INT FOREIGN KEY,
-        id_despachador INT FOREIGN KEY,
-        fecha DATE NOT NULL,
-        hora TIME TMZ,
-        estado VARCHAR(30)
+SQL_4_restaurantes = '''
+    CREATE TABLE IF NOT EXISTS restaurantes(
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(30) NOT NULL UNIQUE,
+        vigencia BOOLEAN NOT NULL,
+        estilo VARCHAR(30) NOT NULL,
+        repartoming INT
     );
+'''
 
-    6. Suscripciones
+SQL_5_platos = '''
+    CREATE TABLE IF NOT EXISTS platos(
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(40) NOT NULL UNIQUE,
+        descripcion TEXT,
+        estilo VARCHAR(30) NOT NULL,
+        restriccion VARCHAR(30),
+        ingredientes TEXT
+        );
+'''
 
-    CREATE TABLE suscripciones(
+
+SQL_6_platos_restaurantes = '''
+    CREATE TABLE IF NOT EXISTS platos_restaurantes(
         id INT PRIMARY KEY,
-        id_cliente INT FOREIGN KEY,
-        id_delivery INT FOREIGN KEY,
-        ultimo_pago: INT,
-        estado: VARCHAR(30),
-        fecha: DATE,
-        ciclo: VARCHAR(30)
+        id_plato INT,
+        id_restaurante INT,
+        disponibilidad BOOLEAN NOT NULL,
+        porciones INT DEFAULT 1 CHECK (porciones >= 1),
+        precio INT NOT NULL,
+        tiempo_prep INT DEFAULT 5 CHECK (tiempo_prep >= 1 AND tiempo_prep <= 60),
+        FOREIGN KEY (id_plato) REFERENCES platos(id),
+        FOREIGN KEY (id_restaurante) REFERENCES restaurantes(id)
     );
+'''
 
-    7. Calificaciones
-
-    CREATE TABLE calificaciones(
-        id INT PRIMARY KEY,
-        id_pedido INT FOREIGN KEY
-        cal_cliente INT CHECK (cal_cliente >= 1 AND cal_cliente <= 5),
-        cal_despachador INT CHECK (cal_despachador >= 1 AND cal_despachador <= 5)
+SQL_7_sucursales = '''
+    CREATE TABLE IF NOT EXISTS sucursales(
+            id Serial UNIQUE,
+            id_restaurante INT,
+            sucursal VARCHAR(30) NOT NULL,
+            direccion TEXT NOT NULL,
+            fono VARCHAR(12) NOT NULL,
+            id_comuna INT,
+            FOREIGN KEY (id_restaurante) REFERENCES restaurantes(id),
+            FOREIGN KEY (id_comuna) REFERENCES comunas(id),
+            PRIMARY KEY(direccion, id_restaurante)
     );
+'''
 
-    8. Deliverys
-
-    CREATE TABLE deliverys(
-        id INT PRIMARY KEY,
-        nombre VARCHAR(30) NOT NULL,
+SQL_8_deliverys = '''
+    CREATE TABLE IF NOT EXISTS deliverys(
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(30) NOT NULL UNIQUE,
         vigencia BOOLEAN NOT NULL,
         fono VARCHAR(12) NOT NULL UNIQUE,
         tiempo_despacho INT NOT NULL,
@@ -111,93 +121,87 @@ A. Crear todas las tablas de datos con los datos respectivos
         precio_mensual INT CHECK (precio_mensual <= 4*precio_unitario),
         precio_anual INT CHECK (precio_mensual <= 12*precio_mensual)
     );
+'''
 
-    9. Restaurantes
-
-    CREATE TABLE restaurantes(
-        id INT PRIMARY KEY,
-        nombre VARCHAR(30) NOT NULL UNIQUE
-        vigencia BOOLEAN NOT NULL
-        estilo VARCHAR(30) NOT NULL
-        repartoming INT
-    )
-
-    10. Sucursales
-
-    CREATE TABLE sucursales(
-        id INT PRIMARY KEY,
-        id_restaurante INT FOREIGN KEY,
-        sucursal VARCHAR(30) NOT NULL,
-        direccion VARCHAR(30) NOT NULL,
-        fonos VARCHAR(12) NOT NULL
+SQL_9_suscripciones = '''
+    CREATE TABLE IF NOT EXISTS suscripciones(
+        id SERIAL,
+        id_cliente INT,
+        id_delivery INT,
+        ultimo_pago INT,
+        estado VARCHAR(30),
+        fecha DATE,
+        ciclo VARCHAR(30),
+        PRIMARY KEY (id_cliente, id_delivery),
+        FOREIGN KEY (id_cliente) REFERENCES clientes(id),
+        FOREIGN KEY (id_delivery) REFERENCES deliverys(id)
     );
+'''
 
-    11. Despachadores
-
-    CREATE TABLE despachadores(
-        id INT PRIMARY KEY,
+SQL_10_despachadores = '''
+    CREATE TABLE IF NOT EXISTS despachadores(
+        id SERIAL PRIMARY KEY,
         nombre VARCHAR(30) NOT NULL,
-        fono VARCHAR(12) NOT NULL
+        fono VARCHAR(12) NOT NULL UNIQUE
     );
+'''
 
-    12. Platos-Restaurantes
+SQL_11_pedidos = '''
+    CREATE TABLE IF NOT EXISTS pedidos(
+        id INT PRIMARY KEY,
+        id_cliente INT,
+        id_delivery INT,
+        id_despachador INT,
+        fecha DATE NOT NULL,
+        hora TIME,
+        estado VARCHAR(30),
+        FOREIGN KEY (id_cliente) REFERENCES clientes(id),
+        FOREIGN KEY (id_delivery) REFERENCES deliverys(id),
+        FOREIGN KEY (id_despachador) REFERENCES despachadores(id)
+    );
+'''
 
-    CREATE TABLE platos_restaurantes(
-        id_plato FOREIGN KEY,
-        id_restaurante FOREIGN KEY
-    )
+SQL_12_calificaciones = '''
+    CREATE TABLE IF NOT EXISTS calificaciones(
+        id_pedido INT PRIMARY KEY,
+        cal_cliente INT CHECK (cal_cliente >= 1 AND cal_cliente <= 5),
+        cal_despachador INT CHECK (cal_despachador >= 1 AND cal_despachador <= 5),
+        FOREIGN KEY (id_pedido) REFERENCES pedidos(id)
+    );
+'''
 
-    13. Ingredientes
+SQL_13_pedidos_platos = '''
+    CREATE TABLE  IF NOT EXISTS pedidos_platos(
+        id_pedido INT,
+        id_plato INT,
+        id_sucursal INT,
+        FOREIGN KEY (id_pedido) REFERENCES pedidos(id),
+        FOREIGN KEY (id_plato) REFERENCES platos_restaurantes(id),
+        PRIMARY KEY (id_pedido, id_plato)
+    );
+'''
 
-    CREATE TABLE ingredientes(
-        id_ingrediente INT PRIMARY KEY,
-        ingrediente VARCHAR(30) NOT NULL
-    )
-
-    14. Platos-Ingredientes
-
-    CREATE TABLE platos_ingredientes(
-        id_plato FOREIGN KEY,
-        id_ingrediente FOREIGN KEY
-    )
-
-    15. Pedidos-Platos
-
-    CREATE TABLE pedidos_platos(
-        id_pedido FOREIGN KEY,
-        id_plato FOREIGN KEY
-    )
-
-    16. Sucursales-Comunas X
-
-    CREATE TABLE sucursales_comunas(
-        id_sucursal FOREIGN KEY,
-        id_comuna FOREIGN KEY
-    )
-
-B. Agregar los datos de los archivos
+B. Agregar los datos de los archivos mediante la carga de datos
     1. clientes.csv
-        - Agregar un ID a todos los clientes, agregar el mismo si se repite
-        - Separar y crear una tabla direccciones clientes, con la direccion, el cut y el id del cliente asociado
+        - Agregar un ID a todos los clientes. Cada cliente tiene un email unico.
+        - Separar y crear una tabla direcciones, porque cada cliente puede tener 1 o mas direcciones y cada direccion puede tener 1 o mas clientes, con el cut comuna.
+        - Separar y crear una tabla direccciones-clientes con id_direccion y el id del cliente asociado.
         - En la tabla clientes quitar todos los elementos repetidos
         - TABLA DIRECCIONES:
             - En la tabla direcciones asignar un id a cada direccion particular
             - Poner el cut de la comuna como una llave foranea
+        - TABLA DIRECION CLIENTE
             - Poner el id del cliente como una llave foranea
             - Poner el id de la direccion como llave primaria
     2. comuna.csv
         - Asignar el cut de la comuna como llave primaria
     3. platos.csv
         - Asignar el id del plato como la llave primaria
-        - No agregar la linea de ingredientes, guardar todos los ingredientes para crear una nueva tabla
-        - TABLA INGREDIENTES:
-            - Poner un id_ingrediente como llave primaria
-            - Poner cada ingrediente asociado
-        - TABLA PLATO_INGREDIENTES
-            - Poner id_ingrediente y id_plato en relacion many o many
+        - Los ingredeintes de se dejará como un texto. Ya que muchos platos tienen ingredientes unicos, por lo que separarlo haria que se creen muchas consultas adicionales.
+        - Para los platos repetidos se dejaran igual, siendo el unico valor unico el id. Esto ya que los platos repetidos pueden ser por ocaciones especiales de descuento o otros. Tambien si un usuario compro en el pasado y se actualiza el plato, el valor del gasto que el cliente hizo tambien se actualizará.
         - TABLA PLATO-RESTAURANTES:
-            - Guardar la tabla de plato restaurantes con el nombre del restoran y el id del plato
-        - Quitar las variables de restaurant, vigente y repartoming porque van en otras tablas
+            - Guardar la tabla de plato restaurantes con el nombre del id del restaurante y el id del plato 
+            - Agregar la disponibilidad, porciones, precio y tiempo. Ya que son variables que dependen del restaurante
     4. cdeldes.csv
         - Separar lo que es delivery, asignar un id_delivery y toda la info relacionada
         - Separa lo que es despachador, asignar un id_despachador y toda la info relacionada
@@ -232,7 +236,43 @@ B. Agregar los datos de los archivos
 
 
 
+Dependencias funcionales:
+
+
+
 Platos -> Cada id es unico. Aun que hay repetidos como es el caso de id 6 y 7, ambos son referenciados en los pedidos
 mas de dos veces, por lo que los dejaremos como si cada id fuera unico (pero solo el id)
 
 Comunas -> Leer con mac_roman
+
+No tienen comuna en la tabla comunas
+Malas
+['Chick-Fil-A', 'TRUE', 'fancy', '6000', 'Estado', 'Calle Estado 456, Santiago Centro', '562765432109', ' Santiago Centro']
+['Donald Mc', 'FALSE', 'fast food', '3000', 'Estado', 'Calle Estado 789, Santiago Centro', '56876543219', ' Santiago Centro']
+['Nolita', 'TRUE', 'fancy', '11000', 'Estado', 'Calle Estado 456, Santiago Centro', '56432109875', ' Santiago Centro']
+['Outback Steak', 'FALSE', 'fast food', '19000', 'Maintención', 'Calle Maintención 123, Maintencillo', '56109876541', ' Maintencillo']
+['Gilded Truffle', 'TRUE', 'internacional', '19000', 'Estado', 'Calle Estado 789, Santiago Centro', '56765432107', ' Santiago Centro']
+['FCK', 'FALSE', 'fast food', '9000', 'Estado', 'Calle Estado 789, Santiago Centro', '56765432105', ' Santiago Centro']
+['FCK', 'FALSE', 'fast food', '9000', 'Maintención', 'Calle Maintención 456, Maintencillo', '56432109872', ' Maintencillo']
+['FCK', 'FALSE', 'fast food', '9000', 'Estado', 'Calle Estado 123, Santiago Centro', '56109876538', ' Santiago Centro']
+['Central Perk', 'FALSE', 'caf√©', '18000', 'Estado', 'Calle Estado 789, Santiago Centro', '562210987649', ' Santiago Centro']
+['Krusty Krab', 'TRUE', 'fancy', '3000', 'Maintención', 'Calle Maintención 456, Maintencillo', '562987654315', ' Maintencillo']
+['Krusty Krab', 'TRUE', 'fancy', '3000', 'Estado', 'Calle Estado 123, Santiago Centro', '562543210981', ' Santiago Centro']
+['Chum Bucket', 'FALSE', 'fast food', '11000', 'Estado', 'Calle Estado 123, Santiago Centro', '562543210979', ' Santiago Centro']
+['Chum Bucket', 'FALSE', 'fast food', '11000', 'Maintención', 'Calle Maintención 789, Maintencillo', '562210987646', ' Maintencillo']
+['Doble Queso', 'TRUE', 'fast food', '3000', 'Estado', 'Calle Estado 456, Santiago Centro', '562987654312', ' Santiago Centro']
+['Pollos Hermanos', 'FALSE', 'internacional', '7000', 'Estado', 'Calle Estado 456, Santiago Centro', '562987654310', ' Santiago Centro']
+['Casiss', 'FALSE', 'caf√©', '10000', 'Maintención', 'Calle Maintención 123, Maintencillo', '562543210976', ' Maintencillo']
+['Casiss', 'FALSE', 'caf√©', '10000', 'Estado', 'Calle Estado 789, Santiago Centro', '562210987643', ' Santiago Centro']
+['Korf', 'FALSE', 'fast food', '16000', 'Estado', 'Calle Estado 789, Santiago Centro', '562210987641', ' Santiago Centro']
+['Korf', 'FALSE', 'fast food', '16000', 'Maintención', 'Calle Maintención 456, Maintencillo', '562987654307', ' Maintencillo']
+['Korf', 'FALSE', 'fast food', '16000', 'Estado', 'Calle Estado 123, Santiago Centro', '562543210973', ' Santiago Centro']
+['Papa Juan', 'FALSE', 'fast food', '15000', 'Estado', 'Calle Estado 123, Santiago Centro', '562543210971', ' Santiago Centro']
+['Papa Juan', 'FALSE', 'fast food', '15000', 'Maintención', 'Calle Maintención 789, Maintencillo', '562210987638', ' Maintencillo']
+['Papa Juan', 'FALSE', 'fast food', '15000', 'Estado', 'Calle Estado 456, Santiago Centro', '562987654304', ' Santiago Centro']
+['Pequeño Cesar', 'FALSE', 'fast food', '8000', 'Estado', 'Calle Estado 456, Santiago Centro', '562987654302', ' Santiago Centro']
+['Metro Sandwich', 'FALSE', 'fast food', '2000', 'Maintención', 'Calle Maintención 123, Maintencillo', '562543210968', ' Maintencillo']
+['Metro Sandwich', 'FALSE', 'fast food', '2000', 'Estado', 'Calle Estado 789, Santiago Centro', '562210987635', ' Santiago Centro']
+['Carlos Sr', 'FALSE', 'fast food', '7000', 'Estado', 'Calle Estado 456, Santiago Centro', '56471396258', ' Santiago Centro']
+['Just Pizza', 'TRUE', 'fast food', '8000', 'Maintención', 'Calle Maintención 123, Maintencillo', '56693258147', ' Maintencillo']
+['Just Pizza', 'TRUE', 'fast food', '8000', 'Estado', 'Calle Estado 789, Santiago Centro', '56825369147', ' Santiago Centro']
